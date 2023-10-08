@@ -1,0 +1,74 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Surovini {
+  id         String        @id @default(uuid())
+  name       String        @unique
+  secondLevel secondLevel[]
+}
+
+model secondLevel {
+  id           String      @id @default(uuid())
+  name         String      @unique
+  Surovini     Surovini?   @relation(fields: [suroviniId], references: [id])
+  suroviniId   String?
+  thirdLevel   thirdLevel[]
+}
+
+model thirdLevel {
+  id             String      @id @default(uuid())
+  name           String      @unique
+  secondLevel    secondLevel @relation(fields: [secondLevelId], references: [id])
+  secondLevelId  String
+  products       Product[]
+}
+
+model Kontragent {
+  id         String     @id @default(uuid())
+  name       String     @unique
+  suppliers  Supplier[]
+}
+
+model Supplier {
+  id                String     @id @default(uuid())
+  name              String     @unique
+  country           String
+  city              String
+  address           String
+  website           String
+  email             String
+  employees         String
+  another           String
+  address_workshop  String
+  phone             String  @default("")
+  kontragent     Kontragent @relation(fields: [kontragentId], references: [id])
+  kontragentId   String
+  products       Product[]
+}
+
+model Product {
+  id           String      @id @default(uuid())
+  name         String      @unique
+  measure      String
+  density      String
+  size         String
+  weight       String
+  description  String
+  another      String
+  code         String
+  package      String
+  cost         String
+  supplier     Supplier    @relation(fields: [supplierId], references: [id])
+  supplierId   String
+  thirdLevel    thirdLevel  @relation(fields: [thirdLevelId], references: [id])
+  thirdLevelId String
+}
